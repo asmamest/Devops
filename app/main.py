@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from prometheus_fastapi_instrumentator import Instrumentator # New import
 
-# --- 1. Logging Setup (Structured Logs) ---
+# ---  Logging Setup (Structured Logs) ---
 # We configure logs to look like JSON for better parsing
 logging.basicConfig(
     level=logging.INFO,
@@ -38,27 +38,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# --- 2. Tracing Middleware ---
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    # Generate a unique ID for this request (Tracing)
-    request_id = str(uuid.uuid4())
-    logger.info(f"Request started - ID: {request_id} - Path: {request.url.path}")
-    
-    start_time = time.time()
-    response = await call_next(request)
-    process_time = time.time() - start_time
-    
-    # Add custom headers for observability
-    response.headers["X-Request-ID"] = request_id
-    response.headers["X-Process-Time"] = str(process_time)
-    
-    logger.info(f"Request completed - ID: {request_id} - Duration: {process_time:.4f}s")
-    return response
 
-# --- 3. Prometheus Metrics ---
-# This automatically creates a /metrics endpoint
-Instrumentator().instrument(app).expose(app)
 
 # --- API Endpoints ---
 @app.get("/", tags=["Root"])
@@ -129,6 +109,8 @@ class TodoBase(BaseModel):
 
 class Todo(TodoBase):
     id: int
+
+
 
 
 if __name__ == "__main__":
