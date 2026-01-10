@@ -118,6 +118,18 @@ async def toggle_todo_completed(todo_id: int):
     logger.info(f"Toggled todo {todo_id} to {todo.completed}")
     return todo
 
+from datetime import date
+
+class TodoBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+    completed: bool = False
+    priority: Optional[int] = None  # 1 = high, 2 = medium, 3 = low
+    due_date: Optional[date] = None
+
+class Todo(TodoBase):
+    id: int
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) # nosec
