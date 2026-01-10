@@ -38,7 +38,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# --- Tracing Middleware ---
+# --- Tracing Middleware ----
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
     # Generate a unique ID for this request (Tracing)
