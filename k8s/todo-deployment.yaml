@@ -23,3 +23,15 @@ spec:
           env:
             - name: PROMETHEUS_MULTIPROC_DIR
               value: "/tmp"
+          readinessProbe: # <-- Ajouté ici
+            httpGet:
+              path: /metrics
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe: # <-- Ajouté ici
+            httpGet:
+              path: /metrics
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 20
