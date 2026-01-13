@@ -102,6 +102,44 @@ Prometheus metrics are exposed at the `/metrics` endpoint.
 curl http://localhost:8000/metrics
 ```
 
+## 🔒 Security
+
+### SAST (Static Application Security Testing)
+The project uses **Bandit** to scan the codebase for security vulnerabilities:
+- Runs automatically in the CI/CD pipeline
+- Scans the `app/` directory for common security issues
+- Executes on every push and pull request
+
+### DAST (Dynamic Application Security Testing)
+The project uses **OWASP ZAP** to scan the running API for security vulnerabilities:
+- Runs automatically after Docker image is built
+- Performs baseline security scan against the deployed API
+- Generates detailed HTML security reports
+- Reports available as GitHub Actions artifacts
+
+**To access DAST reports:**
+1. Go to the [Actions tab](https://github.com/asmamest/Devops/actions) on GitHub
+2. Click on the latest workflow run
+3. Download the `zap-scan-report` artifact
+4. Open `zap-report.html` to view security findings
+
+**To run DAST locally:**
+```bash
+# Start the application
+docker run -d -p 8000:8000 --name todo-api simple-todo-app
+
+# Run OWASP ZAP scan
+docker run -v ${PWD}:/zap/wrk/:rw -t owasp/zap2docker-stable \
+  zap-baseline.py -t http://host.docker.internal:8000 \
+  -r zap-report.html -I
+
+# Stop the application
+docker stop todo-api && docker rm todo-api
+
+# View the report
+start zap-report.html
+```
+
 ## 🧪 Testing
 
 Run the test suite using pytest:
