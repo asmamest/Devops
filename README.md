@@ -129,7 +129,7 @@ The project uses **OWASP ZAP** to scan the running API for security vulnerabilit
 docker run -d -p 8000:8000 --name todo-api simple-todo-app
 
 # Run OWASP ZAP scan
-docker run -v ${PWD}:/zap/wrk/:rw -t owasp/zap2docker-stable \
+docker run -v ${PWD}:/zap/wrk/:rw -t zaproxy/zap-stable \
   zap-baseline.py -t http://host.docker.internal:8000 \
   -r zap-report.html -I
 
