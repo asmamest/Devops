@@ -85,7 +85,7 @@ jobs:
             -r zap-report.html -I
 
       - name: Upload ZAP Security Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: zap-scan-report
