@@ -15,14 +15,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# --- Pydantic Models ---
-class TodoBase(BaseModel):
-    title: str
-    description: Optional[str] = None
-    completed: bool = False
-
-class Todo(TodoBase):
-    id: int
 
 # --- In-Memory Database ---
 db_todos: List[Todo] = [
