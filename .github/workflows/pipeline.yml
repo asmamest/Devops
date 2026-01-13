@@ -57,3 +57,42 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/simple-todo-app:latest
+
+  # JOB 3: DAST Security Scan
+  dast-scan:
+    needs: build-and-push # Only run after Docker image is built
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Pull Docker Image
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/simple-todo-app:latest
+
+      - name: Start Application Container
+        run: |
+          docker run -d -p 8000:8000 --name todo-api \
+            ${{ secrets.DOCKER_USERNAME }}/simple-todo-app:latest
+          sleep 10
+
+      - name: Verify Application is Running
+        run: curl -f http://localhost:8000 || exit 1
+
+      - name: Run OWASP ZAP Baseline Scan (DAST)
+        run: |
+          docker run -v $(pwd):/zap/wrk/:rw -t zaproxy/zap-stable \
+            zap-baseline.py -t http://172.17.0.1:8000 \
+            -r zap-report.html -I
+
+      - name: Upload ZAP Security Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: zap-scan-report
+          path: zap-report.html
+
+      - name: Stop Application Container
+        if: always()
+        run: |
+          docker stop todo-api
+          docker rm todo-api
